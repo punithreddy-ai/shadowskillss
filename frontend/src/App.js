@@ -71,49 +71,190 @@ export default function App() {
 
   useEffect(() => { fetchCronData(); }, []);
 
-  const s = { fontFamily: "Outfit, sans-serif" };
+  // Design system
+  const colors = {
+    primary: "#6366f1",
+    primaryLight: "#818cf8",
+    primaryDark: "#4f46e5",
+    secondary: "#10b981",
+    secondaryLight: "#34d399",
+    accent: "#f59e0b",
+    accentLight: "#fbbf24",
+    background: "#f8fafc",
+    card: "#ffffff",
+    text: "#1e293b",
+    textLight: "#64748b",
+    border: "#e2e8f0",
+    success: "#10b981",
+    warning: "#f59e0b",
+    error: "#ef4444",
+    info: "#3b82f6",
+  };
 
-  const card = (children, extra = {}) => (
-    <div style={{ background: "#fff", borderRadius: 16, padding: 24, boxShadow: "0 1px 4px rgba(0,0,0,0.07)", ...extra }}>
-      {children}
-    </div>
-  );
-
-  const infoCard = (icon, title, desc, extra = {}) => (
-    <div key={title} style={{ border: "1px solid #e5e7eb", borderRadius: 12, padding: "16px 20px", marginBottom: 12, ...extra }}>
-      <h4 style={{ margin: 0, fontWeight: 700, color: "#111827", fontSize: 15 }}>{icon} {title}</h4>
-      <p style={{ margin: "6px 0 0", color: "#6b7280", fontSize: 14 }}>{desc}</p>
-    </div>
-  );
+  const styles = {
+    container: {
+      fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+      minHeight: "100vh",
+      background: "linear-gradient(135deg, #f0f4ff 0%, #f8fafc 100%)",
+      color: colors.text,
+    },
+    sidebar: {
+      width: "240px",
+      background: colors.card,
+      borderRight: `1px solid ${colors.border}`,
+      padding: "28px 20px",
+      display: "flex",
+      flexDirection: "column",
+      gap: "24px",
+      position: "fixed",
+      height: "100vh",
+      overflowY: "auto",
+      boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
+      zIndex: 10,
+    },
+    sidebarLogo: {
+      display: "flex",
+      alignItems: "center",
+      gap: "12px",
+      fontWeight: 800,
+      fontSize: "20px",
+      color: colors.primary,
+      marginBottom: "8px",
+    },
+    sidebarDot: {
+      width: "12px",
+      height: "12px",
+      borderRadius: "50%",
+      background: `linear-gradient(135deg, ${colors.primary}, ${colors.secondary})`,
+      display: "inline-block",
+    },
+    sidebarTagline: {
+      color: colors.textLight,
+      fontSize: "13px",
+      marginTop: "6px",
+      lineHeight: 1.4,
+    },
+    navButton: {
+      textAlign: "left",
+      padding: "10px 16px",
+      borderRadius: "10px",
+      fontSize: "14px",
+      fontWeight: 500,
+      background: active === "Dashboard" ? "#eef2ff" : "transparent",
+      color: active === "Dashboard" ? colors.primary : colors.textLight,
+      border: "none",
+      cursor: "pointer",
+      transition: "all 0.2s ease",
+      marginBottom: "4px",
+    },
+    card: {
+      background: colors.card,
+      borderRadius: "18px",
+      padding: "28px",
+      boxShadow: "0 6px 20px rgba(99, 102, 241, 0.08)",
+      border: `1px solid ${colors.border}`,
+      transition: "transform 0.3s ease, box-shadow 0.3s ease",
+    },
+    cardHover: {
+      transform: "translateY(-4px)",
+      boxShadow: "0 12px 30px rgba(99, 102, 241, 0.15)",
+    },
+    button: {
+      padding: "12px 24px",
+      borderRadius: "12px",
+      background: `linear-gradient(135deg, ${colors.primary}, ${colors.primaryLight})`,
+      color: "#fff",
+      fontWeight: 700,
+      fontSize: "15px",
+      border: "none",
+      cursor: "pointer",
+      transition: "all 0.2s ease",
+      boxShadow: "0 4px 12px rgba(99, 102, 241, 0.3)",
+    },
+    buttonHover: {
+      transform: "scale(1.02)",
+      boxShadow: "0 6px 18px rgba(99, 102, 241, 0.4)",
+    },
+    input: {
+      padding: "14px 20px",
+      borderRadius: "12px",
+      border: `2px solid ${colors.border}`,
+      fontSize: "16px",
+      width: "320px",
+      outline: "none",
+      transition: "border-color 0.2s ease",
+      background: colors.card,
+    },
+    inputFocus: {
+      borderColor: colors.primary,
+      boxShadow: `0 0 0 3px ${colors.primary}20`,
+    },
+  };
 
   // Landing
   if (!data) {
     return (
-      <div style={{ ...s, minHeight: "100vh", background: "linear-gradient(135deg, #f0eeff 0%, #e8f4ff 100%)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
-        <div style={{ textAlign: "center", marginBottom: 32 }}>
-          <div style={{ fontSize: 48 }}>🕵️</div>
-          <h1 style={{ fontSize: 36, fontWeight: 800, color: "#4f46e5", margin: 0 }}>ShadowSkills</h1>
-          <p style={{ color: "#6b7280", marginTop: 8 }}>Quietly tracking your growth in the background.</p>
+      <div style={{ ...styles.container, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "20px" }}>
+        <div style={{ textAlign: "center", marginBottom: "40px", maxWidth: "600px" }}>
+          <div style={{ fontSize: "72px", marginBottom: "20px" }}>🕵️</div>
+          <h1 style={{ fontSize: "48px", fontWeight: 800, background: "linear-gradient(135deg, #6366f1, #10b981)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", margin: 0 }}>ShadowSkills</h1>
+          <p style={{ color: colors.textLight, marginTop: "12px", fontSize: "18px", lineHeight: 1.6 }}>
+            Quietly tracking your growth in the background. Get insights into your GitHub activity, skills, and career potential.
+          </p>
         </div>
-        <div style={{ display: "flex", gap: 12, marginBottom: 12 }}>
+        <div style={{ display: "flex", gap: "16px", marginBottom: "20px", flexWrap: "wrap", justifyContent: "center" }}>
           <input
-            style={{ ...s, padding: "10px 16px", borderRadius: 10, border: "1.5px solid #c4b5fd", fontSize: 15, width: 280, outline: "none" }}
+            style={{ ...styles.input }}
             placeholder="Enter GitHub username"
             value={username}
             onChange={e => setUsername(e.target.value)}
             onKeyDown={e => e.key === "Enter" && analyze()}
+            onFocus={e => e.target.style = { ...styles.input, ...styles.inputFocus }}
+            onBlur={e => e.target.style = styles.input}
           />
-          <button onClick={analyze} style={{ ...s, padding: "10px 24px", borderRadius: 10, background: "#4f46e5", color: "#fff", fontWeight: 700, fontSize: 15, border: "none", cursor: "pointer" }}>
-            {loading ? "Analyzing..." : "Analyze"}
+          <button
+            onClick={analyze}
+            style={{ ...styles.button }}
+            onMouseEnter={e => e.target.style = { ...styles.button, ...styles.buttonHover }}
+            onMouseLeave={e => e.target.style = styles.button}
+            disabled={loading}
+          >
+            {loading ? "🔍 Analyzing..." : "🚀 Analyze"}
           </button>
         </div>
-        {loading && <p style={{ color: "#7c3aed" }}>Reading your digital footprint...</p>}
-        {error && <p style={{ color: "#ef4444" }}>{error}</p>}
-        {cronStatus && (
-          <div style={{ marginTop: 24, background: "#fff", borderRadius: 12, padding: "12px 24px", fontSize: 13, color: "#6b7280", boxShadow: "0 1px 4px rgba(0,0,0,0.07)" }}>
-            🕐 Cron running: <strong>{cronStatus.scheduler_running ? "Yes" : "No"}</strong> · Tracked users: <strong>{cronStatus.tracked_user_count}</strong> · Interval: <strong>{cronStatus.interval_hours}h</strong>
+        {loading && (
+          <div style={{ display: "flex", alignItems: "center", gap: "12px", marginTop: "20px" }}>
+            <div style={{ width: "24px", height: "24px", borderRadius: "50%", border: `3px solid ${colors.border}`, borderTopColor: colors.primary, animation: "spin 1s linear infinite" }}></div>
+            <p style={{ color: colors.primary, fontSize: "16px", fontWeight: 600 }}>Reading your digital footprint...</p>
           </div>
         )}
+        {error && (
+          <div style={{ background: "#fee2e2", border: `1px solid ${colors.error}`, borderRadius: "12px", padding: "16px 24px", marginTop: "20px", maxWidth: "500px" }}>
+            <p style={{ color: colors.error, margin: 0, fontWeight: 600 }}>⚠️ {error}</p>
+          </div>
+        )}
+        {cronStatus && (
+          <div style={{ marginTop: "32px", background: colors.card, borderRadius: "16px", padding: "20px 30px", fontSize: "14px", color: colors.textLight, boxShadow: "0 4px 15px rgba(0,0,0,0.05)", border: `1px solid ${colors.border}` }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
+              <span style={{ fontWeight: 700, color: colors.primary }}>🕐 Cron Status:</span>
+              <span style={{ background: cronStatus.scheduler_running ? "#d1fae5" : "#fee2e2", color: cronStatus.scheduler_running ? "#065f46" : "#991b1b", padding: "4px 12px", borderRadius: "20px", fontWeight: 600 }}>
+                {cronStatus.scheduler_running ? "✅ Running" : "❌ Stopped"}
+              </span>
+              <span>Tracked users: <strong>{cronStatus.tracked_user_count}</strong></span>
+              <span>Interval: <strong>{cronStatus.interval_hours}h</strong></span>
+            </div>
+          </div>
+        )}
+        <style>{`
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+          @media (max-width: 768px) {
+            h1 { font-size: 36px; }
+            input { width: 100%; max-width: 320px; }
+          }
+        `}</style>
       </div>
     );
   }
@@ -124,218 +265,114 @@ export default function App() {
 
   const radarData = {
     labels: skillNames.length ? skillNames : ["Logic", "Speed", "Persistence", "Focus", "Clarity", "Consistency"],
-    datasets: [{ label: "Skills", data: skillValues.length ? skillValues : [80, 85, 75, 90, 70, 78], backgroundColor: "rgba(124,58,237,0.2)", borderColor: "#7c3aed", pointBackgroundColor: "#7c3aed", borderWidth: 2 }]
+    datasets: [{
+      label: "Skills",
+      data: skillValues.length ? skillValues : [80, 85, 75, 90, 70, 78],
+      backgroundColor: "rgba(99, 102, 241, 0.2)",
+      borderColor: colors.primary,
+      pointBackgroundColor: colors.primary,
+      borderWidth: 2,
+      pointRadius: 5,
+    }]
   };
 
   const barData = {
     labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-    datasets: [{ label: "Commits", data: [8, 15, 14, 6, 10, 8, 12], backgroundColor: "#4f46e5", borderRadius: 6 }]
+    datasets: [{
+      label: "Commits",
+      data: [8, 15, 14, 6, 10, 8, 12],
+      backgroundColor: colors.primary,
+      borderRadius: 8,
+      borderSkipped: false,
+    }]
   };
 
-  return (
-    <div style={{ ...s, display: "flex", minHeight: "100vh", background: "#f3f4f6" }}>
+  const InfoCard = ({ icon, title, desc, extra = {} }) => (
+    <div style={{
+      border: `1px solid ${colors.border}`,
+      borderRadius: "14px",
+      padding: "20px",
+      marginBottom: "16px",
+      background: colors.card,
+      transition: "all 0.2s ease",
+      ...extra,
+    }}>
+      <h4 style={{ margin: "0 0 8px", fontWeight: 700, color: colors.text, fontSize: "16px", display: "flex", alignItems: "center", gap: "10px" }}>
+        <span style={{ fontSize: "20px" }}>{icon}</span> {title}
+      </h4>
+      <p style={{ margin: 0, color: colors.textLight, fontSize: "14px", lineHeight: 1.5 }}>{desc}</p>
+    </div>
+  );
 
+  return (
+    <div style={{ ...styles.container, display: "flex", minHeight: "100vh" }}>
       {/* Sidebar */}
-      <aside style={{ width: 220, background: "#fff", borderRight: "1px solid #e5e7eb", padding: "28px 20px", display: "flex", flexDirection: "column", gap: 24, position: "fixed", height: "100vh", overflowY: "auto" }}>
+      <aside style={styles.sidebar}>
         <div>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, fontWeight: 800, fontSize: 18, color: "#4f46e5" }}>
-            <span style={{ width: 10, height: 10, borderRadius: "50%", background: "#7c3aed", display: "inline-block" }}></span>
+          <div style={styles.sidebarLogo}>
+            <span style={styles.sidebarDot}></span>
             ShadowSkills
           </div>
-          <p style={{ color: "#9ca3af", fontSize: 12, marginTop: 6 }}>Quietly tracking your growth in the background.</p>
+          <p style={styles.sidebarTagline}>Quietly tracking your growth in the background.</p>
         </div>
-        <nav style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+        <nav style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
           {NAV.map(n => (
-            <button key={n} onClick={() => setActive(n)} style={{ ...s, textAlign: "left", padding: "8px 12px", borderRadius: 8, fontSize: 13, fontWeight: 500, background: active === n ? "#ede9fe" : "transparent", color: active === n ? "#4f46e5" : "#6b7280", border: "none", cursor: "pointer" }}>{n}</button>
+            <button
+              key={n}
+              onClick={() => setActive(n)}
+              style={{
+                ...styles.navButton,
+                background: active === n ? "#eef2ff" : "transparent",
+                color: active === n ? colors.primary : colors.textLight,
+              }}
+              onMouseEnter={e => e.target.style.background = "#f1f5f9"}
+              onMouseLeave={e => e.target.style.background = active === n ? "#eef2ff" : "transparent"}
+            >
+              {n}
+            </button>
           ))}
         </nav>
-        <button onClick={() => { setData(null); setUsername(""); }} style={{ ...s, marginTop: "auto", fontSize: 12, color: "#9ca3af", background: "none", border: "none", cursor: "pointer", textAlign: "left" }}>← Analyze another</button>
+        <button
+          onClick={() => { setData(null); setUsername(""); }}
+          style={{
+            marginTop: "auto",
+            fontSize: "13px",
+            color: colors.textLight,
+            background: "none",
+            border: "none",
+            cursor: "pointer",
+            textAlign: "left",
+            padding: "10px",
+            borderRadius: "8px",
+            transition: "background 0.2s",
+          }}
+          onMouseEnter={e => e.target.style.background = "#f1f5f9"}
+          onMouseLeave={e => e.target.style.background = "none"}
+        >
+          ← Analyze another user
+        </button>
       </aside>
 
       {/* Main */}
-      <main style={{ marginLeft: 220, flex: 1, padding: 24 }}>
-
+      <main style={{ marginLeft: "240px", flex: 1, padding: "32px", maxWidth: "calc(100vw - 240px)" }}>
         {/* Topbar */}
-        <div style={{ background: "#fff", borderRadius: 16, padding: "16px 24px", display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20, boxShadow: "0 1px 4px rgba(0,0,0,0.07)" }}>
-          <p style={{ margin: 0, fontSize: 16, fontWeight: 600 }}>☀️ Good morning, <span style={{ color: "#7c3aed" }}>{g.name || g.username}</span>! 🌱</p>
-          <p style={{ margin: 0, fontSize: 13, color: "#9ca3af" }}>Based on real activity. No self-assessment.</p>
-        </div>
-
-        {/* Dashboard */}
-        {active === "Dashboard" && (<>
-          <div style={{ background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: 12, padding: "12px 20px", marginBottom: 20, color: "#166534", fontSize: 14 }}>
-            💡 {data.summary}
+        <div style={{
+          background: colors.card,
+          borderRadius: "18px",
+          padding: "24px 32px",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: "28px",
+          boxShadow: "0 4px 15px rgba(0,0,0,0.05)",
+          border: `1px solid ${colors.border}`,
+        }}>
+          <div>
+            <p style={{ margin: 0, fontSize: "20px", fontWeight: 700 }}>
+              ☀️ Good morning, <span style={{ color: colors.primary, fontWeight: 800 }}>{g.name || g.username}</span>! 🌱
+            </p>
+            <p style={{ margin: "8px 0 0", fontSize: "14px", color: colors.textLight }}>
+              Based on real activity. No self‑assessment.
+            </p>
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
-            {card(<>
-              <h3 style={{ margin: "0 0 16px", fontSize: 16, fontWeight: 700 }}>Overview</h3>
-              {[
-                { label: "Consistency Score", value: `${data.skills?.[0]?.confidence || 78}%` },
-                { label: "Confidence Score", value: `${data.skills?.[1]?.confidence || 72}%` },
-                { label: "Public Repos", value: g.public_repos },
-                { label: "Followers", value: g.followers },
-              ].map((m, i) => (
-                <div key={i} style={{ border: "1px solid #e5e7eb", borderRadius: 10, padding: "12px 16px", marginBottom: 10 }}>
-                  <p style={{ margin: 0, fontSize: 13, color: "#6b7280" }}>{m.label}</p>
-                  <p style={{ margin: "4px 0 0", fontSize: 22, fontWeight: 700, color: "#4f46e5" }}>{m.value}</p>
-                </div>
-              ))}
-              <div style={{ background: "#f9fafb", borderRadius: 10, padding: "12px 16px" }}>
-                <p style={{ margin: 0, fontWeight: 700, fontSize: 14 }}>Why this matters</p>
-                <p style={{ margin: "6px 0 0", fontSize: 13, color: "#6b7280" }}>{g.bio || "Your GitHub activity reveals more about you than any resume."}</p>
-              </div>
-            </>)}
-            {card(<>
-              <h3 style={{ margin: "0 0 4px", fontSize: 16, fontWeight: 700 }}>Skill Radar</h3>
-              <p style={{ margin: "0 0 16px", fontSize: 13, color: "#9ca3af" }}>Based on commit frequency, session depth, and task completion patterns.</p>
-              <Radar data={radarData} options={{ scales: { r: { beginAtZero: true, max: 100 } }, plugins: { legend: { display: false } } }} />
-            </>)}
-            {card(<>
-              <h3 style={{ margin: "0 0 16px", fontSize: 16, fontWeight: 700 }}>Activity Overview (Last 7 Days)</h3>
-              <Bar data={barData} options={{ plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }} />
-            </>)}
-            {card(<>
-              <h3 style={{ margin: "0 0 16px", fontSize: 16, fontWeight: 700 }}>Badges Earned</h3>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-                {BADGES.slice(0, 4).map((b, i) => (
-                  <div key={i} style={{ background: "#f5f3ff", borderRadius: 12, padding: 16, textAlign: "center" }}>
-                    <div style={{ fontSize: 28 }}>{b.icon}</div>
-                    <p style={{ margin: "8px 0 0", fontWeight: 700, fontSize: 13 }}>{b.title}</p>
-                  </div>
-                ))}
-              </div>
-            </>)}
-          </div>
-        </>)}
-
-        {/* Projects */}
-        {active === "Projects" && card(<>
-          <h3 style={{ margin: "0 0 16px", fontSize: 18, fontWeight: 700 }}>Projects</h3>
-          {g.repos?.slice(0, 6).map((r, i) => infoCard("📁", r.name, `${r.description || "No description."} ⭐ ${r.stars} · 🍴 ${r.forks}${r.language ? ` · 💻 ${r.language}` : ""}`))}
-        </>)}
-
-        {/* Insights */}
-        {active === "Insights" && card(<>
-          <h3 style={{ margin: "0 0 16px", fontSize: 18, fontWeight: 700 }}>Insights</h3>
-          {data.hidden_strengths?.map((s, i) => infoCard(["🌟", "💡", "🚀"][i] || "✨", `Strength #${i + 1}`, s))}
-          {data.blind_spots?.map((s, i) => infoCard("⚠️", `Blind Spot #${i + 1}`, s))}
-        </>)}
-
-        {/* Activity */}
-        {active === "Activity" && card(<>
-          <h3 style={{ margin: "0 0 16px", fontSize: 18, fontWeight: 700 }}>Activity</h3>
-          {infoCard("📝", "Recent Commits", `${g.commit_summary?.commit_count || 0} commits analyzed across all public repos.`)}
-          {g.commit_summary?.recent_commits?.map((c, i) => (
-            <div key={i} style={{ border: "1px solid #e5e7eb", borderRadius: 12, padding: "12px 16px", marginBottom: 10 }}>
-              <p style={{ margin: 0, fontWeight: 600, fontSize: 14, color: "#4f46e5" }}>📦 {c.repo}</p>
-              <p style={{ margin: "4px 0 0", fontSize: 13, color: "#374151" }}>{c.message?.slice(0, 120)}</p>
-              {c.timestamp && <p style={{ margin: "4px 0 0", fontSize: 11, color: "#9ca3af" }}>{new Date(c.timestamp).toLocaleString()}</p>}
-            </div>
-          ))}
-        </>)}
-
-        {/* Career */}
-        {active === "Career Suggestions" && card(<>
-          <h3 style={{ margin: "0 0 16px", fontSize: 18, fontWeight: 700 }}>Career Suggestions</h3>
-          {data.career_roles?.map((r, i) => (
-            <div key={i} style={{ border: "1px solid #e5e7eb", borderRadius: 12, padding: "16px 20px", marginBottom: 12 }}>
-              <h4 style={{ margin: 0, fontWeight: 700, fontSize: 15 }}>{["🎯", "🧠", "🚀"][i]} {r}</h4>
-              <p style={{ margin: "6px 0 8px", color: "#6b7280", fontSize: 14 }}>This role matches your behavioral patterns and GitHub activity.</p>
-              <a href={`https://unstop.com/jobs?searchTerm=${encodeURIComponent(r)}`} target="_blank" rel="noreferrer"
-                style={{ display: "inline-block", padding: "6px 16px", background: "#4f46e5", color: "#fff", borderRadius: 8, fontSize: 13, fontWeight: 600, textDecoration: "none", marginRight: 8 }}>
-                🔍 Find Jobs on Unstop
-              </a>
-              <a href={`https://unstop.com/internships?searchTerm=${encodeURIComponent(r)}`} target="_blank" rel="noreferrer"
-                style={{ display: "inline-block", padding: "6px 16px", background: "#7c3aed", color: "#fff", borderRadius: 8, fontSize: 13, fontWeight: 600, textDecoration: "none" }}>
-                🎓 Find Internships
-              </a>
-            </div>
-          ))}
-        </>)}
-
-        {/* Badges */}
-        {active === "Badges" && card(<>
-          <h3 style={{ margin: "0 0 16px", fontSize: 18, fontWeight: 700 }}>Badges</h3>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-            {BADGES.map((b, i) => (
-              <div key={i} style={{ background: "#f5f3ff", borderRadius: 14, padding: 24, textAlign: "center" }}>
-                <div style={{ fontSize: 40 }}>{b.icon}</div>
-                <p style={{ margin: "10px 0 4px", fontWeight: 700, fontSize: 15 }}>{b.title}</p>
-                <p style={{ margin: 0, fontSize: 13, color: "#6b7280" }}>{b.desc}</p>
-              </div>
-            ))}
-          </div>
-        </>)}
-
-        {/* Time Breaker */}
-        {active === "Time Breaker" && card(<>
-          <h3 style={{ margin: "0 0 4px", fontSize: 18, fontWeight: 700 }}>⚡ Time Breaker</h3>
-          <p style={{ margin: "0 0 16px", fontSize: 13, color: "#9ca3af" }}>Top 5 fastest consecutive commits — shows your speed and momentum.</p>
-          {data.time_breaker?.length ? data.time_breaker.map((t, i) => (
-            <div key={i} style={{ border: "1px solid #e5e7eb", borderRadius: 12, padding: "14px 18px", marginBottom: 12, display: "flex", alignItems: "center", gap: 16 }}>
-              <div style={{ fontSize: 28, fontWeight: 800, color: "#4f46e5", minWidth: 36 }}>#{t.rank}</div>
-              <div style={{ flex: 1 }}>
-                <p style={{ margin: 0, fontWeight: 600, fontSize: 14, color: "#111827" }}>{t.message}</p>
-                <p style={{ margin: "4px 0 0", fontSize: 12, color: "#9ca3af" }}>📦 {t.repo} · {new Date(t.committed_at).toLocaleString()}</p>
-              </div>
-              <div style={{ background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: 10, padding: "6px 14px", textAlign: "center" }}>
-                <p style={{ margin: 0, fontSize: 18, fontWeight: 800, color: "#16a34a" }}>{t.gap_minutes}m</p>
-                <p style={{ margin: 0, fontSize: 11, color: "#6b7280" }}>gap</p>
-              </div>
-            </div>
-          )) : <p style={{ color: "#9ca3af" }}>No time breaker data available for this user.</p>}
-        </>)}
-
-        {/* Cron Status */}
-        {active === "Cron Status" && (<>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginBottom: 20 }}>
-            {card(<>
-              <h3 style={{ margin: "0 0 16px", fontSize: 16, fontWeight: 700 }}>🕐 Scheduler Info</h3>
-              {cronStatus ? (<>
-                {[
-                  { label: "Scheduler Running", value: cronStatus.scheduler_running ? "✅ Yes" : "❌ No" },
-                  { label: "Interval", value: `Every ${cronStatus.interval_hours} hours` },
-                  { label: "Tracked Users", value: cronStatus.tracked_user_count },
-                  { label: "Next Run", value: cronStatus.jobs?.[0]?.next_run ? new Date(cronStatus.jobs[0].next_run).toLocaleString() : "N/A" },
-                ].map((m, i) => (
-                  <div key={i} style={{ display: "flex", justifyContent: "space-between", padding: "10px 0", borderBottom: "1px solid #f3f4f6" }}>
-                    <span style={{ color: "#6b7280", fontSize: 14 }}>{m.label}</span>
-                    <span style={{ fontWeight: 700, fontSize: 14 }}>{m.value}</span>
-                  </div>
-                ))}
-                <button onClick={triggerCron} style={{ ...s, marginTop: 16, width: "100%", padding: "10px", background: "#4f46e5", color: "#fff", borderRadius: 10, fontWeight: 700, border: "none", cursor: "pointer", fontSize: 14 }}>
-                  ▶️ Trigger Cron Now
-                </button>
-                {triggerMsg && <p style={{ color: "#16a34a", textAlign: "center", marginTop: 8, fontSize: 13 }}>{triggerMsg}</p>}
-              </>) : <p style={{ color: "#9ca3af" }}>Loading...</p>}
-            </>)}
-            {card(<>
-              <h3 style={{ margin: "0 0 16px", fontSize: 16, fontWeight: 700 }}>👥 Tracked Users</h3>
-              {Object.keys(trackedUsers).length ? Object.entries(trackedUsers).map(([u, meta], i) => (
-                <div key={i} style={{ border: "1px solid #e5e7eb", borderRadius: 10, padding: "10px 14px", marginBottom: 10 }}>
-                  <p style={{ margin: 0, fontWeight: 700, color: "#4f46e5" }}>@{u}</p>
-                  <p style={{ margin: "4px 0 0", fontSize: 12, color: "#9ca3af" }}>Added: {new Date(meta.added_at).toLocaleString()}</p>
-                </div>
-              )) : <p style={{ color: "#9ca3af", fontSize: 14 }}>No users tracked yet. Analyze a user to start tracking.</p>}
-            </>)}
-          </div>
-          {card(<>
-            <h3 style={{ margin: "0 0 16px", fontSize: 16, fontWeight: 700 }}>📋 Cron Logs</h3>
-            {cronLogs.length ? [...cronLogs].reverse().map((log, i) => (
-              <div key={i} style={{ border: "1px solid #e5e7eb", borderRadius: 10, padding: "12px 16px", marginBottom: 12 }}>
-                <p style={{ margin: "0 0 8px", fontWeight: 700, fontSize: 13, color: "#374151" }}>🕐 {new Date(log.run_at).toLocaleString()}</p>
-                {log.results?.map((r, j) => (
-                  <div key={j} style={{ display: "flex", justifyContent: "space-between", fontSize: 13, padding: "4px 0", borderBottom: "1px solid #f9fafb" }}>
-                    <span>@{r.username}</span>
-                    <span style={{ color: r.status === "ok" ? "#16a34a" : "#ef4444" }}>{r.status === "ok" ? "✅ Success" : `❌ ${r.error}`}</span>
-                  </div>
-                ))}
-              </div>
-            )) : <p style={{ color: "#9ca3af", fontSize: 14 }}>No cron runs yet. Trigger one above!</p>}
-          </>)}
-        </>)}
-
-      </main>
-    </div>
-  );
-}
+          <div style
