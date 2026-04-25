@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Radar, Bar } from "react-chartjs-2";
 import {
   Chart as ChartJS, RadialLinearScale, PointElement, LineElement,
@@ -21,6 +21,83 @@ const BADGES = [
   { icon: "🏁", title: "Ship Captain", desc: "You consistently turn ideas into shipped projects." },
 ];
 
+// Animated counter hook
+function useCountUp(end, duration = 1500, start = 0) {
+  const [count, setCount] = useState(start);
+  const rafRef = useRef();
+
+  useEffect(() => {
+    const startTime = performance.now();
+    const animate = (currentTime) => {
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const easeOutQuart = 1 - Math.pow(1 - progress, 4);
+      const current = Math.round(start + (end - start) * easeOutQuart);
+      setCount(current);
+      if (progress < 1) {
+        rafRef.current = requestAnimationFrame(animate);
+      }
+    };
+    rafRef.current = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(rafRef.current);
+  }, [end, duration, start]);
+
+  return count;
+}
+
+// Animated progress bar component
+function AnimatedProgressBar({ value, color = "#7c3aed", delay = 0 }) {
+  const [width, setWidth] = useState(0);
+  useEffect(() => {
+    const timer = setTimeout(() => setWidth(value), delay);
+    return () => clearTimeout(timer);
+  }, [value, delay]);
+
+  return (
+    <div className="progress-bar-container">
+      <div
+        className="progress-bar-fill"
+        style={{
+          width: `${width}%`,
+          background: `linear-gradient(90deg, ${color} 0%, ${color}dd 100%)`,
+        }}
+      />
+    </div>
+  );
+}
+
+// Stat card with animated counter
+function StatCard({ label, value, suffix = "", color = "#111827", delay = 0 }) {
+  const numericValue = typeof value === 'number' ? value : parseInt(value) || 0;
+  const count = useCountUp(numericValue, 1500, 0);
+
+  return (
+    <div className={`fade-in-up delay-${delay} hover-lift`} style={{
+      background: "#fff",
+      borderRadius: 16,
+      padding: "20px 24px",
+      boxShadow: "0 2px 12px rgba(0,0,0,0.06)",
+      border: "1px solid rgba(168, 85, 247, 0.08)",
+    }}>
+      <p style={{ margin: 0, fontSize: 13, color: "#6b7280", fontWeight: 500, letterSpacing: "0.02em" }}>{label}</p>
+      <p style={{ margin: "8px 0 0", fontSize: 32, fontWeight: 800, color, fontFamily: "Poppins, sans-serif" }}>
+        {count}{suffix}
+      </p>
+    </div>
+  );
+}
+
+// Wave component for landing page
+function Waves() {
+  return (
+    <div className="wave-container">
+      <div className="wave" />
+      <div className="wave" />
+      <div className="wave" />
+    </div>
+  );
+}
+
 export default function App() {
   const [username, setUsername] = useState("");
   const [data, setData] = useState(null);
@@ -31,6 +108,9 @@ export default function App() {
   const [cronLogs, setCronLogs] = useState([]);
   const [trackedUsers, setTrackedUsers] = useState({});
   const [triggerMsg, setTriggerMsg] = useState("");
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => { setMounted(true); }, []);
 
   const analyze = async () => {
     if (!username) return;
@@ -71,194 +151,238 @@ export default function App() {
 
   useEffect(() => { fetchCronData(); }, []);
 
-  // Design system
-  const colors = {
-    primary: "#6366f1",
-    primaryLight: "#818cf8",
-    primaryDark: "#4f46e5",
-    secondary: "#10b981",
-    secondaryLight: "#34d399",
-    accent: "#f59e0b",
-    accentLight: "#fbbf24",
-    background: "#f8fafc",
-    card: "#ffffff",
-    text: "#1e293b",
-    textLight: "#64748b",
-    border: "#e2e8f0",
-    success: "#10b981",
-    warning: "#f59e0b",
-    error: "#ef4444",
-    info: "#3b82f6",
-  };
+  const s = { fontFamily: "Inter, sans-serif" };
 
-  const styles = {
-    container: {
-      fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-      minHeight: "100vh",
-      background: "linear-gradient(135deg, #f0f4ff 0%, #f8fafc 100%)",
-      color: colors.text,
-    },
-    sidebar: {
-      width: "240px",
-      background: colors.card,
-      borderRight: `1px solid ${colors.border}`,
-      padding: "28px 20px",
-      display: "flex",
-      flexDirection: "column",
-      gap: "24px",
-      position: "fixed",
-      height: "100vh",
-      overflowY: "auto",
-      boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
-      zIndex: 10,
-    },
-    sidebarLogo: {
-      display: "flex",
-      alignItems: "center",
-      gap: "12px",
-      fontWeight: 800,
-      fontSize: "20px",
-      color: colors.primary,
-      marginBottom: "8px",
-    },
-    sidebarDot: {
-      width: "12px",
-      height: "12px",
-      borderRadius: "50%",
-      background: `linear-gradient(135deg, ${colors.primary}, ${colors.secondary})`,
-      display: "inline-block",
-    },
-    sidebarTagline: {
-      color: colors.textLight,
-      fontSize: "13px",
-      marginTop: "6px",
-      lineHeight: 1.4,
-    },
-    navButton: {
-      textAlign: "left",
-      padding: "10px 16px",
-      borderRadius: "10px",
-      fontSize: "14px",
-      fontWeight: 500,
-      background: active === "Dashboard" ? "#eef2ff" : "transparent",
-      color: active === "Dashboard" ? colors.primary : colors.textLight,
-      border: "none",
-      cursor: "pointer",
-      transition: "all 0.2s ease",
-      marginBottom: "4px",
-    },
-    card: {
-      background: colors.card,
-      borderRadius: "18px",
-      padding: "28px",
-      boxShadow: "0 6px 20px rgba(99, 102, 241, 0.08)",
-      border: `1px solid ${colors.border}`,
-      transition: "transform 0.3s ease, box-shadow 0.3s ease",
-    },
-    cardHover: {
-      transform: "translateY(-4px)",
-      boxShadow: "0 12px 30px rgba(99, 102, 241, 0.15)",
-    },
-    button: {
-      padding: "12px 24px",
-      borderRadius: "12px",
-      background: `linear-gradient(135deg, ${colors.primary}, ${colors.primaryLight})`,
-      color: "#fff",
-      fontWeight: 700,
-      fontSize: "15px",
-      border: "none",
-      cursor: "pointer",
-      transition: "all 0.2s ease",
-      boxShadow: "0 4px 12px rgba(99, 102, 241, 0.3)",
-    },
-    buttonHover: {
-      transform: "scale(1.02)",
-      boxShadow: "0 6px 18px rgba(99, 102, 241, 0.4)",
-    },
-    input: {
-      padding: "14px 20px",
-      borderRadius: "12px",
-      border: `2px solid ${colors.border}`,
-      fontSize: "16px",
-      width: "320px",
-      outline: "none",
-      transition: "border-color 0.2s ease",
-      background: colors.card,
-    },
-    inputFocus: {
-      borderColor: colors.primary,
-      boxShadow: `0 0 0 3px ${colors.primary}20`,
-    },
-  };
+  const card = (children, extra = {}, delay = 0) => (
+    <div className={`fade-in-up delay-${delay} hover-lift`} style={{
+      background: "#fff",
+      borderRadius: 16,
+      padding: 24,
+      boxShadow: "0 2px 12px rgba(0,0,0,0.06)",
+      border: "1px solid rgba(168, 85, 247, 0.08)",
+      ...extra
+    }}>
+      {children}
+    </div>
+  );
 
-  // Landing
+  const infoCard = (icon, title, desc, extra = {}, delay = 0) => (
+    <div key={title} className={`fade-in-up delay-${delay} hover-lift`} style={{
+      border: "1.5px solid rgba(168, 85, 247, 0.12)",
+      borderRadius: 12,
+      padding: "16px 20px",
+      marginBottom: 12,
+      background: "#fff",
+      ...extra
+    }}>
+      <h4 style={{ margin: 0, fontWeight: 700, color: "#111827", fontSize: 15 }}>{icon} {title}</h4>
+      <p style={{ margin: "6px 0 0", color: "#6b7280", fontSize: 14, lineHeight: 1.5 }}>{desc}</p>
+    </div>
+  );
+
+  // ========== LANDING PAGE ==========
   if (!data) {
     return (
-      <div style={{ ...styles.container, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "20px" }}>
-        <div style={{ textAlign: "center", marginBottom: "40px", maxWidth: "600px" }}>
-          <div style={{ fontSize: "72px", marginBottom: "20px" }}>🕵️</div>
-          <h1 style={{ fontSize: "48px", fontWeight: 800, background: "linear-gradient(135deg, #6366f1, #10b981)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", margin: 0 }}>ShadowSkills</h1>
-          <p style={{ color: colors.textLight, marginTop: "12px", fontSize: "18px", lineHeight: 1.6 }}>
-            Quietly tracking your growth in the background. Get insights into your GitHub activity, skills, and career potential.
+      <div style={{
+        ...s,
+        minHeight: "100vh",
+        background: "linear-gradient(135deg, #faf5ff 0%, #f0fdf4 40%, #fff7ed 100%)",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        position: "relative",
+        overflow: "hidden",
+      }}>
+        {/* Subtle background pattern */}
+        <div style={{
+          position: "absolute",
+          top: 0, left: 0, right: 0, bottom: 0,
+          backgroundImage: "radial-gradient(circle at 20% 50%, rgba(168, 85, 247, 0.04) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(34, 197, 94, 0.04) 0%, transparent 50%)",
+          pointerEvents: "none",
+        }} />
+
+        {/* Floating decorative elements */}
+        <div className="float-animation" style={{
+          position: "absolute",
+          top: "15%",
+          left: "10%",
+          width: 60,
+          height: 60,
+          borderRadius: "50%",
+          background: "linear-gradient(135deg, rgba(168, 85, 247, 0.1) 0%, rgba(124, 58, 237, 0.05) 100%)",
+          filter: "blur(1px)",
+        }} />
+        <div className="float-animation" style={{
+          position: "absolute",
+          top: "25%",
+          right: "15%",
+          width: 40,
+          height: 40,
+          borderRadius: "50%",
+          background: "linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(16, 185, 129, 0.05) 100%)",
+          filter: "blur(1px)",
+          animationDelay: "1s",
+        }} />
+        <div className="float-animation" style={{
+          position: "absolute",
+          bottom: "30%",
+          left: "15%",
+          width: 30,
+          height: 30,
+          borderRadius: "50%",
+          background: "linear-gradient(135deg, rgba(168, 85, 247, 0.08) 0%, transparent 100%)",
+          filter: "blur(1px)",
+          animationDelay: "2s",
+        }} />
+
+        {/* Main content */}
+        <div style={{
+          textAlign: "center",
+          zIndex: 2,
+          maxWidth: 700,
+          padding: "0 24px",
+        }}>
+          {/* Tagline */}
+          <div className={mounted ? "fade-in-up" : ""} style={{ marginBottom: 48 }}>
+            <h1 style={{
+              fontSize: "clamp(36px, 6vw, 64px)",
+              fontWeight: 800,
+              color: "#111827",
+              margin: 0,
+              lineHeight: 1.15,
+              fontFamily: "Poppins, sans-serif",
+              letterSpacing: "-0.02em",
+            }}>
+              Stop guessing your skills.
+            </h1>
+            <h1 style={{
+              fontSize: "clamp(36px, 6vw, 64px)",
+              fontWeight: 800,
+              color: "#7c3aed",
+              margin: "8px 0 0",
+              lineHeight: 1.15,
+              fontFamily: "Poppins, sans-serif",
+              letterSpacing: "-0.02em",
+            }}>
+              Start observing them.
+            </h1>
+          </div>
+
+          {/* Subtitle */}
+          <p className="fade-in-up delay-2" style={{
+            color: "#6b7280",
+            fontSize: 17,
+            marginBottom: 40,
+            lineHeight: 1.6,
+            fontWeight: 400,
+          }}>
+            Enter your GitHub username to unlock insights about your coding patterns, strengths, and growth opportunities.
           </p>
-        </div>
-        <div style={{ display: "flex", gap: "16px", marginBottom: "20px", flexWrap: "wrap", justifyContent: "center" }}>
-          <input
-            style={{ ...styles.input }}
-            placeholder="Enter GitHub username"
-            value={username}
-            onChange={e => setUsername(e.target.value)}
-            onKeyDown={e => e.key === "Enter" && analyze()}
-            onFocus={e => e.target.style = { ...styles.input, ...styles.inputFocus }}
-            onBlur={e => e.target.style = styles.input}
-          />
-          <button
-            onClick={analyze}
-            style={{ ...styles.button }}
-            onMouseEnter={e => e.target.style = { ...styles.button, ...styles.buttonHover }}
-            onMouseLeave={e => e.target.style = styles.button}
-            disabled={loading}
-          >
-            {loading ? "🔍 Analyzing..." : "🚀 Analyze"}
-          </button>
-        </div>
-        {loading && (
-          <div style={{ display: "flex", alignItems: "center", gap: "12px", marginTop: "20px" }}>
-            <div style={{ width: "24px", height: "24px", borderRadius: "50%", border: `3px solid ${colors.border}`, borderTopColor: colors.primary, animation: "spin 1s linear infinite" }}></div>
-            <p style={{ color: colors.primary, fontSize: "16px", fontWeight: 600 }}>Reading your digital footprint...</p>
+
+          {/* Input + Button */}
+          <div className="fade-in-up delay-3" style={{
+            display: "flex",
+            gap: 12,
+            justifyContent: "center",
+            flexWrap: "wrap",
+            marginBottom: 16,
+          }}>
+            <input
+              className="glass-input"
+              style={{
+                ...s,
+                padding: "14px 20px",
+                borderRadius: 14,
+                fontSize: 16,
+                width: 300,
+                color: "#111827",
+              }}
+              placeholder="Enter GitHub username"
+              value={username}
+              onChange={e => setUsername(e.target.value)}
+              onKeyDown={e => e.key === "Enter" && analyze()}
+            />
+            <button
+              onClick={analyze}
+              className="btn-purple"
+              style={{
+                ...s,
+                padding: "14px 32px",
+                borderRadius: 14,
+                fontWeight: 700,
+                fontSize: 16,
+                display: "flex",
+                alignItems: "center",
+                alignItems: "center",
+                gap: 8,
+              }}
+            >
+              {loading ? (
+                <>
+                  <span className="pulse-soft" style={{ display: "inline-block" }}>◌</span>
+                  Analyzing...
+                </>
+              ) : (
+                <>
+                  <span>🔍</span>
+                  Analyze
+                </>
+              )}
+            </button>
           </div>
-        )}
-        {error && (
-          <div style={{ background: "#fee2e2", border: `1px solid ${colors.error}`, borderRadius: "12px", padding: "16px 24px", marginTop: "20px", maxWidth: "500px" }}>
-            <p style={{ color: colors.error, margin: 0, fontWeight: 600 }}>⚠️ {error}</p>
-          </div>
-        )}
-        {cronStatus && (
-          <div style={{ marginTop: "32px", background: colors.card, borderRadius: "16px", padding: "20px 30px", fontSize: "14px", color: colors.textLight, boxShadow: "0 4px 15px rgba(0,0,0,0.05)", border: `1px solid ${colors.border}` }}>
-            <div style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
-              <span style={{ fontWeight: 700, color: colors.primary }}>🕐 Cron Status:</span>
-              <span style={{ background: cronStatus.scheduler_running ? "#d1fae5" : "#fee2e2", color: cronStatus.scheduler_running ? "#065f46" : "#991b1b", padding: "4px 12px", borderRadius: "20px", fontWeight: 600 }}>
-                {cronStatus.scheduler_running ? "✅ Running" : "❌ Stopped"}
-              </span>
-              <span>Tracked users: <strong>{cronStatus.tracked_user_count}</strong></span>
-              <span>Interval: <strong>{cronStatus.interval_hours}h</strong></span>
+
+          {loading && (
+            <p className="fade-in" style={{ color: "#7c3aed", fontSize: 14, marginTop: 16 }}>
+              <span className="pulse-soft">✨</span> Reading your digital footprint...
+            </p>
+          )}
+          {error && (
+            <p className="fade-in-up" style={{ color: "#ef4444", fontSize: 14, marginTop: 16, background: "#fef2f2", padding: "10px 16px", borderRadius: 10, display: "inline-block" }}>
+              ⚠️ {error}
+            </p>
+          )}
+
+          {/* Cron status badge */}
+          {cronStatus && (
+            <div className="fade-in-up delay-4" style={{
+              marginTop: 32,
+              background: "rgba(255,255,255,0.7)",
+              backdropFilter: "blur(10px)",
+              borderRadius: 12,
+              padding: "12px 24px",
+              fontSize: 13,
+              color: "#6b7280",
+              boxShadow: "0 2px 12px rgba(0,0,0,0.04)",
+              border: "1px solid rgba(168, 85, 247, 0.08)",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 12,
+            }}>
+              <span style={{
+                width: 8,
+                height: 8,
+                borderRadius: "50%",
+                background: cronStatus.scheduler_running ? "#22c55e" : "#ef4444",
+                display: "inline-block",
+                boxShadow: cronStatus.scheduler_running ? "0 0 8px rgba(34, 197, 94, 0.4)" : "none",
+              }} />
+              <span>Cron {cronStatus.scheduler_running ? "running" : "stopped"}</span>
+              <span style={{ color: "#d1d5db" }}>|</span>
+              <span>{cronStatus.tracked_user_count} tracked</span>
+              <span style={{ color: "#d1d5db" }}>|</span>
+              <span>Every {cronStatus.interval_hours}h</span>
             </div>
-          </div>
-        )}
-        <style>{`
-          @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-          }
-          @media (max-width: 768px) {
-            h1 { font-size: 36px; }
-            input { width: 100%; max-width: 320px; }
-          }
-        `}</style>
+          )}
+        </div>
+
+        {/* Waves */}
+        <Waves />
       </div>
     );
   }
 
+  // ========== DASHBOARD DATA ==========
   const g = data.github || {};
   const skillNames = data.skills?.map(s => s.name) || [];
   const skillValues = data.skills?.map(s => s.confidence) || [];
@@ -268,11 +392,15 @@ export default function App() {
     datasets: [{
       label: "Skills",
       data: skillValues.length ? skillValues : [80, 85, 75, 90, 70, 78],
-      backgroundColor: "rgba(99, 102, 241, 0.2)",
-      borderColor: colors.primary,
-      pointBackgroundColor: colors.primary,
-      borderWidth: 2,
+      backgroundColor: "rgba(124, 58, 237, 0.15)",
+      borderColor: "#7c3aed",
+      pointBackgroundColor: "#7c3aed",
+      pointBorderColor: "#fff",
+      pointHoverBackgroundColor: "#fff",
+      pointHoverBorderColor: "#7c3aed",
       pointRadius: 5,
+      pointHoverRadius: 8,
+      borderWidth: 2.5,
     }]
   };
 
@@ -281,98 +409,204 @@ export default function App() {
     datasets: [{
       label: "Commits",
       data: [8, 15, 14, 6, 10, 8, 12],
-      backgroundColor: colors.primary,
+      backgroundColor: [
+        "rgba(17, 24, 39, 0.8)",
+        "rgba(124, 58, 237, 0.8)",
+        "rgba(34, 197, 94, 0.8)",
+        "rgba(17, 24, 39, 0.6)",
+        "rgba(124, 58, 237, 0.6)",
+        "rgba(34, 197, 94, 0.6)",
+        "rgba(17, 24, 39, 0.5)",
+      ],
       borderRadius: 8,
       borderSkipped: false,
+      hoverBackgroundColor: [
+        "#111827",
+        "#7c3aed",
+        "#22c55e",
+        "#374151",
+        "#8b5cf6",
+        "#16a34a",
+        "#4b5563",
+      ],
     }]
   };
 
-  const InfoCard = ({ icon, title, desc, extra = {} }) => (
-    <div style={{
-      border: `1px solid ${colors.border}`,
-      borderRadius: "14px",
-      padding: "20px",
-      marginBottom: "16px",
-      background: colors.card,
-      transition: "all 0.2s ease",
-      ...extra,
-    }}>
-      <h4 style={{ margin: "0 0 8px", fontWeight: 700, color: colors.text, fontSize: "16px", display: "flex", alignItems: "center", gap: "10px" }}>
-        <span style={{ fontSize: "20px" }}>{icon}</span> {title}
-      </h4>
-      <p style={{ margin: 0, color: colors.textLight, fontSize: "14px", lineHeight: 1.5 }}>{desc}</p>
-    </div>
-  );
+  const radarOptions = {
+    scales: {
+      r: {
+        beginAtZero: true,
+        max: 100,
+        ticks: {
+          display: false,
+          stepSize: 20,
+        },
+        grid: {
+          color: "rgba(168, 85, 247, 0.1)",
+        },
+        angleLines: {
+          color: "rgba(168, 85, 247, 0.1)",
+        },
+        pointLabels: {
+          font: { size: 12, family: "Inter, sans-serif", weight: "600" },
+          color: "#4b5563",
+        },
+      }
+    },
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        backgroundColor: "#111827",
+        titleFont: { family: "Inter, sans-serif", size: 13 },
+        bodyFont: { family: "Inter, sans-serif", size: 12 },
+        padding: 12,
+        cornerRadius: 10,
+        displayColors: false,
+      },
+    },
+    animation: {
+      duration: 1500,
+      easing: "easeOutQuart",
+    },
+  };
 
+  const barOptions = {
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        backgroundColor: "#111827",
+        titleFont: { family: "Inter, sans-serif", size: 13 },
+        bodyFont: { family: "Inter, sans-serif", size: 12 },
+        padding: 12,
+        cornerRadius: 10,
+        displayColors: false,
+      },
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        grid: { color: "rgba(168, 85, 247, 0.06)", drawBorder: false },
+        ticks: {
+          font: { family: "Inter, sans-serif", size: 11 },
+          color: "#9ca3af",
+          padding: 8,
+        },
+      },
+      x: {
+        grid: { display: false },
+        ticks: {
+          font: { family: "Inter, sans-serif", size: 12, weight: "500" },
+          color: "#6b7280",
+          padding: 8,
+        },
+      },
+    },
+    animation: {
+      duration: 1200,
+      easing: "easeOutQuart",
+      delay: (context) => context.dataIndex * 100,
+    },
+    onHover: (event, activeElements) => {
+      event.native.target.style.cursor = activeElements.length > 0 ? "pointer" : "default";
+    },
+  };
+
+  // ========== DASHBOARD PAGE ==========
   return (
-    <div style={{ ...styles.container, display: "flex", minHeight: "100vh" }}>
+    <div style={{
+      ...s,
+      display: "flex",
+      minHeight: "100vh",
+      background: "linear-gradient(135deg, #faf5ff 0%, #f0fdf4 50%, #fff7ed 100%)",
+      backgroundAttachment: "fixed",
+    }}>
+
       {/* Sidebar */}
-      <aside style={styles.sidebar}>
-        <div>
-          <div style={styles.sidebarLogo}>
-            <span style={styles.sidebarDot}></span>
+      <aside className="slide-in-left" style={{
+        width: 240,
+        background: "rgba(255, 255, 255, 0.85)",
+        backdropFilter: "blur(20px)",
+        borderRight: "1px solid rgba(168, 85, 247, 0.1)",
+        padding: "28px 20px",
+        display: "flex",
+        flexDirection: "column",
+        gap: 24,
+        position: "fixed",
+        height: "100vh",
+        overflowY: "auto",
+        zIndex: 10,
+      }}>
+        <div className="fade-in-up">
+          <div style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+            fontWeight: 800,
+            fontSize: 20,
+            color: "#111827",
+            fontFamily: "Poppins, sans-serif",
+          }}>
+            <span style={{
+              width: 10,
+              height: 10,
+              borderRadius: "50%",
+              background: "linear-gradient(135deg, #7c3aed 0%, #a855f7 100%)",
+              display: "inline-block",
+              boxShadow: "0 0 12px rgba(124, 58, 237, 0.3)",
+            }} />
             ShadowSkills
           </div>
-          <p style={styles.sidebarTagline}>Quietly tracking your growth in the background.</p>
+          <p style={{ color: "#9ca3af", fontSize: 12, marginTop: 8, lineHeight: 1.5 }}>
+            Quietly tracking your growth in the background.
+          </p>
         </div>
-        <nav style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-          {NAV.map(n => (
+
+        <nav style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+          {NAV.map((n, i) => (
             <button
               key={n}
               onClick={() => setActive(n)}
+              className={`sidebar-item ${active === n ? "active" : ""}`}
               style={{
-                ...styles.navButton,
-                background: active === n ? "#eef2ff" : "transparent",
-                color: active === n ? colors.primary : colors.textLight,
+                ...s,
+                textAlign: "left",
+                padding: "10px 14px",
+                borderRadius: 10,
+                fontSize: 13,
+                fontWeight: active === n ? 600 : 500,
+                background: active === n ? "linear-gradient(90deg, rgba(168, 85, 247, 0.1) 0%, transparent 100%)" : "transparent",
+                color: active === n ? "#7c3aed" : "#6b7280",
+                border: "none",
+                cursor: "pointer",
+                transition: "all 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
+                transform: active === n ? "translateX(4px)" : "translateX(0)",
               }}
-              onMouseEnter={e => e.target.style.background = "#f1f5f9"}
-              onMouseLeave={e => e.target.style.background = active === n ? "#eef2ff" : "transparent"}
             >
               {n}
             </button>
           ))}
         </nav>
-        <button
-          onClick={() => { setData(null); setUsername(""); }}
-          style={{
-            marginTop: "auto",
-            fontSize: "13px",
-            color: colors.textLight,
-            background: "none",
-            border: "none",
-            cursor: "pointer",
-            textAlign: "left",
-            padding: "10px",
-            borderRadius: "8px",
-            transition: "background 0.2s",
-          }}
-          onMouseEnter={e => e.target.style.background = "#f1f5f9"}
-          onMouseLeave={e => e.target.style.background = "none"}
-        >
-          ← Analyze another user
-        </button>
-      </aside>
 
-      {/* Main */}
-      <main style={{ marginLeft: "240px", flex: 1, padding: "32px", maxWidth: "calc(100vw - 240px)" }}>
-        {/* Topbar */}
-        <div style={{
-          background: colors.card,
-          borderRadius: "18px",
-          padding: "24px 32px",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: "28px",
-          boxShadow: "0 4px 15px rgba(0,0,0,0.05)",
-          border: `1px solid ${colors.border}`,
-        }}>
-          <div>
-            <p style={{ margin: 0, fontSize: "20px", fontWeight: 700 }}>
-              ☀️ Good morning, <span style={{ color: colors.primary, fontWeight: 800 }}>{g.name || g.username}</span>! 🌱
-            </p>
-            <p style={{ margin: "8px 0 0", fontSize: "14px", color: colors.textLight }}>
-              Based on real activity. No self‑assessment.
-            </p>
-          </div>
-          <div style
+                <button
+                  onClick={() => { setData(null); setUsername(""); }}
+                  className="fade-in-up delay-5"
+                  style={{
+                    ...s,
+                    marginTop: "auto",
+                    fontSize: 12,
+                    color: "#9ca3af",
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                    textAlign: "left",
+                    padding: "8px 12px",
+                    borderRadius: 8,
+                    transition: "all 0.3s ease",
+                  }}
+                >
+                  Reset profile
+                </button>
+              </aside>
+            </div>
+          );
+        }
