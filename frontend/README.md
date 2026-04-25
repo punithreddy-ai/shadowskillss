@@ -1,70 +1,154 @@
-# Getting Started with Create React App
+<div align="center">
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# 🌑 ShadowSkills
 
-## Available Scripts
+### *Stop guessing your skills. Start observing them.*
 
-In the project directory, you can run:
+**AI-powered developer profiling — based on what you do, not what you claim.**
 
-### `npm start`
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.136-009688?style=flat-square&logo=fastapi)](https://fastapi.tiangolo.com)
+[![React](https://img.shields.io/badge/React-18-61DAFB?style=flat-square&logo=react)](https://reactjs.org)
+[![Groq](https://img.shields.io/badge/AI-Groq%20LLaMA-F55036?style=flat-square)](https://groq.com)
+[![GitHub API](https://img.shields.io/badge/Data-GitHub%20API-181717?style=flat-square&logo=github)](https://docs.github.com/en/rest)
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+</div>
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+---
 
-### `npm test`
+## 🔍 What is ShadowSkills?
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Most developers don't know what they're actually good at. Resumes are guesswork. ShadowSkills fixes that by **inferring your real skills from your digital behavior** — your GitHub commits, your patterns, your consistency — not from what you write about yourself.
 
-### `npm run build`
+> No forms. No self-rating. Just your GitHub and the truth.
+> Primary users : students
+> secondary users : HR / Recruiters
+---
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## 📸 Preview
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+| Landing | Dashboard |
+|--------|-----------|
+| ![Landing](screenshots/1_ss.jpeg) | ![Dashboard](screenshots/6_ss.jpeg) |
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+| Insights | Career Suggestions |
+|---------|-------------------|
+| ![Insights](screenshots/5_ss.jpeg) | ![Career](screenshots/4_ss.jpeg) |
 
-### `npm run eject`
+| Badges | Time Breaker |
+|--------|-------------|
+| ![Badges](screenshots/3_ss.jpeg) | ![TimeBreaker](screenshots/2_ss.jpeg) |
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+| Cron Status | Unstop Integration |
+|------------|-------------------|
+| ![Cron](screenshots/7_ss.jpeg) | ![Unstop](screenshots/8_ss.jpeg) |
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+---
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+## ✨ Features
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+### 📊 Dashboard
+Real-time overview with **Consistency Score**, **Confidence Score**, public repos, followers, and a 7-day activity bar chart — all derived from actual GitHub data.
 
-## Learn More
+### 🕸️ Skill Radar
+Hexagonal radar chart mapping your skills across Logic, Speed, Consistency, Time Spent, Focus, and Persistence — inferred from commit patterns, not self-assessment.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+### 🧠 Insights
+AI-generated **hidden strengths** and **blind spots** based on your actual repositories and commit history. Powered by Groq's LLaMA 3.1.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### 📁 Projects
+All your GitHub repositories in one place — with language tags, descriptions, stars, and forks.
 
-### Code Splitting
+### 📈 Activity
+7-day commit heatmap + full recent commit log with timestamps and repo references.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+### 💼 Career Suggestions
+Role recommendations matched to your behavioral patterns. Integrated with **Unstop** to surface real internship and job listings with match scores and auto-apply.
 
-### Analyzing the Bundle Size
+### 🏅 Badges
+Earn badges based on real behavior — Focus Master, Consistent Coder, Early Bird, Guardian Reviewer, Momentum Streak, and more.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+### ⚡ Time Breaker
+Leaderboard of your **top 5 fastest consecutive commits** — ranked by time gap between commits in the same repo. With podium, date, time, and commit message.
 
-### Making a Progressive Web App
+### 🔄 Cron Status
+Background scheduler that automatically re-analyses all tracked users every 24 hours. View tracked users, next run time, and full cron logs.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+---
 
-### Advanced Configuration
+## 🛠️ Tech Stack
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+| Layer | Tech |
+|---|---|
+| Frontend | React 18 + Chart.js |
+| Backend | FastAPI + Python |
+| AI | Groq API (LLaMA 3.1 8B Instant) |
+| Data | GitHub REST API |
+| Scheduler | APScheduler (cron every 24h) |
+| Career | Unstop API (mock for demo) |
+| Social | LinkedIn Activity (mock for demo) |
 
-### Deployment
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+## 🚀 Getting Started
 
-### `npm run build` fails to minify
+### 1. Clone the repo
+```bash
+git clone https://github.com/your-username/shadowskills.git
+cd shadowskills
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+### 2. Backend setup
+```bash
+cd backend
+pip install fastapi uvicorn groq apscheduler python-dotenv requests
+```
+
+Create a `.env` file in `/backend`:
+```
+GROQ_API_KEY=your_groq_key_here
+GITHUB_TOKEN=
+CRON_INTERVAL_HOURS=24
+```
+
+Run the backend:
+```bash
+python -m uvicorn main:app --reload --port 8001
+```
+
+### 3. Frontend setup
+```bash
+cd frontend
+npm install
+npm start
+```
+
+Open [http://localhost:3000](http://localhost:3000) — enter any GitHub username and go.
+
+---
+
+## 📡 API Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/analyze/{username}` | Full GitHub + AI analysis |
+| `GET` | `/cache/{username}` | Serve cached result instantly |
+| `GET` | `/time-breaker/{username}` | Top 5 fastest commit intervals |
+| `POST` | `/linkedin/login` | Demo LinkedIn login |
+| `GET` | `/mock/full/{username}` |  Unstop data |
+| `POST` | `/track/{username}` | Register for auto re-analysis |
+| `GET` | `/cron/status` | Scheduler health + next run |
+| `POST` | `/cron/trigger` | Manually fire cron run |
+
+---
+
+## 👥 Team
+
+**Terminal.exe**
+
+Built at **Athernex Hackathon** · Track: AI & Productivity
+
+---
+
+<div align="center">
+  <sub>Your GitHub is already your best resume. We just read it for you.</sub>
+</div>
