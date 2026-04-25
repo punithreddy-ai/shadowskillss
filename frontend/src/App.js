@@ -45,6 +45,12 @@ function useCountUp(end, duration = 1500, start = 0) {
   return count;
 }
 
+// Simple counter for inline use
+function Counter({ value }) {
+  const count = useCountUp(value, 1500, 0);
+  return <>{count}</>;
+}
+
 // Animated progress bar component
 function AnimatedProgressBar({ value, color = "#7c3aed", delay = 0 }) {
   const [width, setWidth] = useState(0);
@@ -313,7 +319,6 @@ export default function App() {
                 fontWeight: 700,
                 fontSize: 16,
                 display: "flex",
-                alignItems: "center",
                 alignItems: "center",
                 gap: 8,
               }}
@@ -587,26 +592,324 @@ export default function App() {
           ))}
         </nav>
 
-                <button
-                  onClick={() => { setData(null); setUsername(""); }}
-                  className="fade-in-up delay-5"
-                  style={{
-                    ...s,
-                    marginTop: "auto",
-                    fontSize: 12,
-                    color: "#9ca3af",
-                    background: "none",
-                    border: "none",
-                    cursor: "pointer",
-                    textAlign: "left",
-                    padding: "8px 12px",
-                    borderRadius: 8,
-                    transition: "all 0.3s ease",
-                  }}
-                >
-                  Reset profile
-                </button>
-              </aside>
+        <button
+          onClick={() => { setData(null); setUsername(""); }}
+          className="fade-in-up delay-5"
+          style={{
+            ...s,
+            marginTop: "auto",
+            fontSize: 12,
+            color: "#9ca3af",
+            background: "none",
+            border: "none",
+            cursor: "pointer",
+            textAlign: "left",
+            padding: "8px 12px",
+            borderRadius: 8,
+            transition: "all 0.3s ease",
+          }}
+          onMouseEnter={e => { e.target.style.color = "#7c3aed"; e.target.style.background = "rgba(168, 85, 247, 0.05)"; }}
+          onMouseLeave={e => { e.target.style.color = "#9ca3af"; e.target.style.background = "none"; }}
+        >
+          ← Analyze another
+        </button>
+      </aside>
+
+      {/* Main Content */}
+      <main style={{ marginLeft: 240, flex: 1, padding: 24, minHeight: "100vh" }}>
+
+        {/* Topbar */}
+        <div className="fade-in-up" style={{
+          background: "rgba(255, 255, 255, 0.8)",
+          backdropFilter: "blur(20px)",
+          borderRadius: 16,
+          padding: "16px 24px",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: 20,
+          boxShadow: "0 2px 12px rgba(0,0,0,0.04)",
+          border: "1px solid rgba(168, 85, 247, 0.08)",
+        }}>
+          <p style={{ margin: 0, fontSize: 16, fontWeight: 600, color: "#111827" }}>
+            ☀️ Good morning, <span style={{ color: "#7c3aed", fontWeight: 700 }}>{g.name || g.username}</span>! 🌱
+          </p>
+          <p style={{ margin: 0, fontSize: 13, color: "#9ca3af" }}>
+            Based on real activity. No self-assessment.
+          </p>
+        </div>
+
+        {/* Dashboard */}
+        {active === "Dashboard" && (<>
+          <div className="fade-in-up delay-1" style={{
+            background: "linear-gradient(135deg, rgba(34, 197, 94, 0.08) 0%, rgba(168, 85, 247, 0.06) 100%)",
+            border: "1.5px solid rgba(34, 197, 94, 0.15)",
+            borderRadius: 12,
+            padding: "14px 20px",
+            marginBottom: 20,
+            color: "#166534",
+            fontSize: 14,
+            fontWeight: 500,
+          }}>
+            💡 {data.summary}
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 16, marginBottom: 20 }}>
+            <StatCard label="Consistency Score" value={data.skills?.[0]?.confidence || 78} suffix="%" color="#111827" delay={1} />
+            <StatCard label="Confidence Score" value={data.skills?.[1]?.confidence || 72} suffix="%" color="#7c3aed" delay={2} />
+            <StatCard label="Public Repos" value={g.public_repos || 0} color="#22c55e" delay={3} />
+            <StatCard label="Followers" value={g.followers || 0} color="#111827" delay={4} />
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
+            {card(<>
+              <h3 style={{ margin: "0 0 16px", fontSize: 16, fontWeight: 700, color: "#111827" }}>Skill Radar</h3>
+              <p style={{ margin: "0 0 16px", fontSize: 13, color: "#9ca3af" }}>Based on commit frequency, session depth, and task completion patterns.</p>
+              <div className="chart-container">
+                <Radar data={radarData} options={radarOptions} />
+              </div>
+              {/* Skill progress bars */}
+              <div style={{ marginTop: 20, display: "flex", flexDirection: "column", gap: 12 }}>
+                {data.skills?.map((skill, i) => (
+                  <div key={skill.name}>
+                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
+                      <span style={{ fontSize: 13, fontWeight: 600, color: "#111827" }}>{skill.name}</span>
+                      <span style={{ fontSize: 13, fontWeight: 700, color: "#7c3aed" }}>{skill.confidence}%</span>
+                    </div>
+                    <AnimatedProgressBar
+                      value={skill.confidence}
+                      color={i % 3 === 0 ? "#111827" : i % 3 === 1 ? "#7c3aed" : "#22c55e"}
+                      delay={i * 200}
+                    />
+                  </div>
+                ))}
+              </div>
+            </>, {}, 2)}
+
+            {card(<>
+              <h3 style={{ margin: "0 0 16px", fontSize: 16, fontWeight: 700, color: "#111827" }}>Activity Overview (Last 7 Days)</h3>
+              <div className="chart-container">
+                <Bar data={barData} options={barOptions} />
+              </div>
+            </>, {}, 3)}
+
+            {card(<>
+              <h3 style={{ margin: "0 0 16px", fontSize: 16, fontWeight: 700, color: "#111827" }}>Why this matters</h3>
+              <p style={{ margin: 0, fontSize: 14, color: "#6b7280", lineHeight: 1.7 }}>
+                {g.bio || "Your GitHub activity reveals more about you than any resume. We analyze your commit patterns, repository diversity, and coding consistency to surface insights that help you grow."}
+              </p>
+            </>, {}, 4)}
+
+            {card(<>
+              <h3 style={{ margin: "0 0 16px", fontSize: 16, fontWeight: 700, color: "#111827" }}>Quick Stats</h3>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                {[
+                  { label: "Total Commits", value: g.commit_summary?.commit_count || 0, color: "#111827" },
+                  { label: "Languages", value: [...new Set(g.repos?.map(r => r.language).filter(Boolean))].length || 0, color: "#7c3aed" },
+                  { label: "Top Repo Stars", value: Math.max(...(g.repos?.map(r => r.stars) || [0])), color: "#22c55e" },
+                  { label: "Total Forks", value: g.repos?.reduce((a, r) => a + (r.forks || 0), 0) || 0, color: "#111827" },
+                ].map((stat, i) => (
+                  <div key={i} style={{
+                    background: "linear-gradient(135deg, rgba(168, 85, 247, 0.05) 0%, rgba(34, 197, 94, 0.05) 100%)",
+                    borderRadius: 10,
+                    padding: "14px 16px",
+                    textAlign: "center",
+                    border: "1px solid rgba(168, 85, 247, 0.08)",
+                  }}>
+                    <p style={{ margin: 0, fontSize: 22, fontWeight: 800, color: stat.color, fontFamily: "Poppins, sans-serif" }}>
+                      <Counter value={stat.value} />
+                    </p>
+                    <p style={{ margin: "4px 0 0", fontSize: 12, color: "#9ca3af", fontWeight: 500 }}>{stat.label}</p>
+                  </div>
+                ))}
+              </div>
+            </>, {}, 5)}
+          </div>
+        </>)}
+
+        {/* Projects */}
+        {active === "Projects" && card(<>
+          <h3 style={{ margin: "0 0 20px", fontSize: 20, fontWeight: 700, color: "#111827" }}>Projects</h3>
+          {g.repos?.slice(0, 6).map((r, i) => infoCard("📁", r.name, `${r.description || "No description."} ⭐ ${r.stars} · 🍴 ${r.forks}${r.language ? ` · 💻 ${r.language}` : ""}`, {}, i))}
+        </>, {}, 1)}
+
+        {/* Insights */}
+        {active === "Insights" && card(<>
+          <h3 style={{ margin: "0 0 20px", fontSize: 20, fontWeight: 700, color: "#111827" }}>Insights</h3>
+          {data.hidden_strengths?.map((st, i) => infoCard(["🌟", "💡", "🚀"][i] || "✨", `Strength #${i + 1}`, st, {}, i))}
+          {data.blind_spots?.map((st, i) => infoCard("⚠️", `Blind Spot #${i + 1}`, st, { borderColor: "rgba(239, 68, 68, 0.15)", background: "#fef2f2" }, i + 3))}
+        </>, {}, 1)}
+
+        {/* Activity */}
+        {active === "Activity" && card(<>
+          <h3 style={{ margin: "0 0 20px", fontSize: 20, fontWeight: 700, color: "#111827" }}>Activity</h3>
+          {infoCard("📝", "Recent Commits", `${g.commit_summary?.commit_count || 0} commits analyzed across all public repos.`, {}, 0)}
+          {g.commit_summary?.recent_commits?.map((c, i) => (
+            <div key={i} className={`fade-in-up delay-${Math.min(i + 1, 8)} hover-lift`} style={{
+              border: "1.5px solid rgba(168, 85, 247, 0.12)",
+              borderRadius: 12,
+              padding: "14px 18px",
+              marginBottom: 10,
+              background: "#fff",
+            }}>
+              <p style={{ margin: 0, fontWeight: 700, fontSize: 14, color: "#7c3aed" }}>📦 {c.repo}</p>
+              <p style={{ margin: "6px 0 0", fontSize: 13, color: "#374151", lineHeight: 1.5 }}>{c.message?.slice(0, 120)}</p>
+              {c.timestamp && <p style={{ margin: "6px 0 0", fontSize: 11, color: "#9ca3af" }}>{new Date(c.timestamp).toLocaleString()}</p>}
             </div>
-          );
-        }
+          ))}
+        </>, {}, 1)}
+
+        {/* Career */}
+        {active === "Career Suggestions" && card(<>
+          <h3 style={{ margin: "0 0 20px", fontSize: 20, fontWeight: 700, color: "#111827" }}>Career Suggestions</h3>
+          {data.career_roles?.map((r, i) => (
+            <div key={i} className={`fade-in-up delay-${i + 1} hover-lift`} style={{
+              border: "1.5px solid rgba(168, 85, 247, 0.12)",
+              borderRadius: 14,
+              padding: "20px 24px",
+              marginBottom: 14,
+              background: "#fff",
+            }}>
+              <h4 style={{ margin: 0, fontWeight: 700, fontSize: 16, color: "#111827" }}>{["🎯", "🧠", "🚀"][i]} {r}</h4>
+              <p style={{ margin: "8px 0 12px", color: "#6b7280", fontSize: 14, lineHeight: 1.6 }}>This role matches your behavioral patterns and GitHub activity.</p>
+              <a href={`https://unstop.com/jobs?searchTerm=${encodeURIComponent(r)}`} target="_blank" rel="noreferrer"
+                style={{ display: "inline-block", padding: "8px 18px", background: "linear-gradient(135deg, #111827 0%, #374151 100%)", color: "#fff", borderRadius: 10, fontSize: 13, fontWeight: 600, textDecoration: "none", marginRight: 10, transition: "all 0.3s ease" }}
+                onMouseEnter={e => { e.target.style.transform = "translateY(-2px)"; e.target.style.boxShadow = "0 8px 20px rgba(17, 24, 39, 0.25)"; }}
+                onMouseLeave={e => { e.target.style.transform = "translateY(0)"; e.target.style.boxShadow = "none"; }}
+              >
+                🔍 Find Jobs on Unstop
+              </a>
+              <a href={`https://unstop.com/internships?searchTerm=${encodeURIComponent(r)}`} target="_blank" rel="noreferrer"
+                style={{ display: "inline-block", padding: "8px 18px", background: "linear-gradient(135deg, #7c3aed 0%, #a855f7 100%)", color: "#fff", borderRadius: 10, fontSize: 13, fontWeight: 600, textDecoration: "none", transition: "all 0.3s ease" }}
+                onMouseEnter={e => { e.target.style.transform = "translateY(-2px)"; e.target.style.boxShadow = "0 8px 20px rgba(124, 58, 237, 0.35)"; }}
+                onMouseLeave={e => { e.target.style.transform = "translateY(0)"; e.target.style.boxShadow = "none"; }}
+              >
+                🎓 Find Internships
+              </a>
+            </div>
+          ))}
+        </>, {}, 1)}
+
+        {/* Badges */}
+        {active === "Badges" && card(<>
+          <h3 style={{ margin: "0 0 20px", fontSize: 20, fontWeight: 700, color: "#111827" }}>Badges</h3>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+            {BADGES.map((b, i) => (
+              <div key={i} className={`fade-in-up delay-${Math.min(i + 1, 8)} badge-card`} style={{
+                background: "linear-gradient(135deg, rgba(168, 85, 247, 0.06) 0%, rgba(34, 197, 94, 0.04) 100%)",
+                borderRadius: 16,
+                padding: 28,
+                textAlign: "center",
+                border: "1.5px solid rgba(168, 85, 247, 0.1)",
+              }}>
+                <div style={{ fontSize: 44, marginBottom: 8 }}>{b.icon}</div>
+                <p style={{ margin: "8px 0 4px", fontWeight: 700, fontSize: 15, color: "#111827" }}>{b.title}</p>
+                <p style={{ margin: 0, fontSize: 13, color: "#6b7280", lineHeight: 1.5 }}>{b.desc}</p>
+              </div>
+            ))}
+          </div>
+        </>, {}, 1)}
+
+        {/* Time Breaker */}
+        {active === "Time Breaker" && card(<>
+          <h3 style={{ margin: "0 0 4px", fontSize: 20, fontWeight: 700, color: "#111827" }}>⚡ Time Breaker</h3>
+          <p style={{ margin: "0 0 20px", fontSize: 13, color: "#9ca3af" }}>Top 5 fastest consecutive commits — shows your speed and momentum.</p>
+          {data.time_breaker?.length ? data.time_breaker.map((t, i) => (
+            <div key={i} className={`fade-in-up delay-${Math.min(i + 1, 8)} hover-lift`} style={{
+              border: "1.5px solid rgba(168, 85, 247, 0.12)",
+              borderRadius: 14,
+              padding: "16px 20px",
+              marginBottom: 12,
+              display: "flex",
+              alignItems: "center",
+              gap: 16,
+              background: "#fff",
+            }}>
+              <div style={{ fontSize: 28, fontWeight: 800, color: "#7c3aed", minWidth: 40, fontFamily: "Poppins, sans-serif" }}>#{t.rank}</div>
+              <div style={{ flex: 1 }}>
+                <p style={{ margin: 0, fontWeight: 600, fontSize: 14, color: "#111827" }}>{t.message}</p>
+                <p style={{ margin: "4px 0 0", fontSize: 12, color: "#9ca3af" }}>📦 {t.repo} · {new Date(t.committed_at).toLocaleString()}</p>
+              </div>
+              <div style={{
+                background: "linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(34, 197, 94, 0.05) 100%)",
+                border: "1.5px solid rgba(34, 197, 94, 0.2)",
+                borderRadius: 12,
+                padding: "8px 16px",
+                textAlign: "center",
+              }}>
+                <p style={{ margin: 0, fontSize: 20, fontWeight: 800, color: "#16a34a", fontFamily: "Poppins, sans-serif" }}>{t.gap_minutes}m</p>
+                <p style={{ margin: 0, fontSize: 11, color: "#6b7280" }}>gap</p>
+              </div>
+            </div>
+          )) : <p style={{ color: "#9ca3af" }}>No time breaker data available for this user.</p>}
+        </>, {}, 1)}
+
+        {/* Cron Status */}
+        {active === "Cron Status" && (<>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginBottom: 20 }}>
+            {card(<>
+              <h3 style={{ margin: "0 0 16px", fontSize: 16, fontWeight: 700, color: "#111827" }}>🕐 Scheduler Info</h3>
+              {cronStatus ? (<>
+                {[
+                  { label: "Scheduler Running", value: cronStatus.scheduler_running ? "✅ Yes" : "❌ No" },
+                  { label: "Interval", value: `Every ${cronStatus.interval_hours} hours` },
+                  { label: "Tracked Users", value: cronStatus.tracked_user_count },
+                  { label: "Next Run", value: cronStatus.jobs?.[0]?.next_run ? new Date(cronStatus.jobs[0].next_run).toLocaleString() : "N/A" },
+                ].map((m, i) => (
+                  <div key={i} style={{ display: "flex", justifyContent: "space-between", padding: "10px 0", borderBottom: "1px solid rgba(168, 85, 247, 0.08)" }}>
+                    <span style={{ color: "#6b7280", fontSize: 14 }}>{m.label}</span>
+                    <span style={{ fontWeight: 700, fontSize: 14, color: "#111827" }}>{m.value}</span>
+                  </div>
+                ))}
+                <button onClick={triggerCron} className="btn-purple" style={{
+                  ...s, marginTop: 16, width: "100%", padding: "10px", borderRadius: 10, fontWeight: 700, fontSize: 14,
+                }}>
+                  ▶️ Trigger Cron Now
+                </button>
+                {triggerMsg && <p className="fade-in-up" style={{ color: "#16a34a", textAlign: "center", marginTop: 8, fontSize: 13 }}>{triggerMsg}</p>}
+              </>) : <p style={{ color: "#9ca3af" }}>Loading...</p>}
+            </>, {}, 1)}
+
+            {card(<>
+              <h3 style={{ margin: "0 0 16px", fontSize: 16, fontWeight: 700, color: "#111827" }}>👥 Tracked Users</h3>
+              {Object.keys(trackedUsers).length ? Object.entries(trackedUsers).map(([u, meta], i) => (
+                <div key={i} className="fade-in-up hover-lift" style={{
+                  border: "1.5px solid rgba(168, 85, 247, 0.12)",
+                  borderRadius: 10,
+                  padding: "10px 14px",
+                  marginBottom: 10,
+                  background: "#fff",
+                }}>
+                  <p style={{ margin: 0, fontWeight: 700, color: "#7c3aed" }}>@{u}</p>
+                  <p style={{ margin: "4px 0 0", fontSize: 12, color: "#9ca3af" }}>Added: {new Date(meta.added_at).toLocaleString()}</p>
+                </div>
+              )) : <p style={{ color: "#9ca3af", fontSize: 14 }}>No users tracked yet. Analyze a user to start tracking.</p>}
+            </>, {}, 2)}
+          </div>
+
+          {card(<>
+            <h3 style={{ margin: "0 0 16px", fontSize: 16, fontWeight: 700, color: "#111827" }}>📋 Cron Logs</h3>
+            {cronLogs.length ? [...cronLogs].reverse().map((log, i) => (
+              <div key={i} className={`fade-in-up delay-${Math.min(i + 1, 8)}`} style={{
+                border: "1.5px solid rgba(168, 85, 247, 0.12)",
+                borderRadius: 12,
+                padding: "14px 18px",
+                marginBottom: 12,
+                background: "#fff",
+              }}>
+                <p style={{ margin: "0 0 8px", fontWeight: 700, fontSize: 13, color: "#374151" }}>🕐 {new Date(log.run_at).toLocaleString()}</p>
+                {log.results?.map((r, j) => (
+                  <div key={j} style={{ display: "flex", justifyContent: "space-between", fontSize: 13, padding: "4px 0", borderBottom: "1px solid rgba(168, 85, 247, 0.06)" }}>
+                    <span style={{ color: "#6b7280" }}>@{r.username}</span>
+                    <span style={{ color: r.status === "ok" ? "#16a34a" : "#ef4444", fontWeight: 600 }}>{r.status === "ok" ? "✅ Success" : `❌ ${r.error}`}</span>
+                  </div>
+                ))}
+              </div>
+            )) : <p style={{ color: "#9ca3af", fontSize: 14 }}>No cron runs yet. Trigger one above!</p>}
+          </>, {}, 3)}
+        </>)}
+
+      </main>
+    </div>
+  );
+}
